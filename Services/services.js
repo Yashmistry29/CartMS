@@ -60,7 +60,7 @@ exports.getCart = async (req, res) => {
     const cartDetails = await cart.findOne({ customerId }).populate("medicines.medicineId");
 
     if (!cartDetails) {
-      return res.status(404).json({ status: 'fail', message: 'Cart is empty' });
+      return res.status(200).json({ status: 'fail', message: 'Cart is empty', data: cartDetails });
     }
 
     res.status(200).json({
@@ -120,18 +120,19 @@ exports.updateCart = async (req, res) => {
 
 exports.deleteCart = async (req, res) => {
   try {
+
+    console.log("In deleteCart");
     const { customerId } = req.params;
     const customerExists = await isValidCustomer(customerId);
     if (!customerExists) {
       return res.status(404).json({ status: 'fail', message: 'Customer not found' });
     }
 
-    const delete_cart = await cart.deleteOne({ customerId: customerId })
+    const delete_cart = await cart.findOneAndDelete({ customerId: customerId })
     
     res.status(200).json({
       status: 'success',
       message: 'Removed all items from the cart',
-      data: delete_cart
     })
     
   } catch (err) {
